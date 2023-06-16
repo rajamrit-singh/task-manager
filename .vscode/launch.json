@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug Express",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/src/index.js",
+        "cwd": "${workspaceFolder}",
+        "args": [],
+        "protocol": "inspector",
+        "outputCapture": "std",
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen",
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "restart": true,
+        "port": 9229,
+        "sourceMaps": false
+      }
+    ]
+  }
+  

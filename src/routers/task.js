@@ -47,7 +47,12 @@ router.patch('/tasks/:id', async (req, res) => {
         return res.status(400).send('error: Invalid update')
     }
     try {
-        const task = await Task.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true }) // new = This will return new user instead of existing user that was found
+        const task = await Task.findById(_id);
+        updates.forEach((update) => {
+            task[update] = req.body[update]
+        })
+        task.save();
+        // const task = await Task.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true }) // new = This will return new user instead of existing user that was found
         if(!task) {
             return res.status(404).send()
         } else {
