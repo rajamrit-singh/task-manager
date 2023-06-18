@@ -91,9 +91,7 @@ const userSchema = new mongoose.Schema({
 // generate a method on a specific user (adding methods on instances of object/model)
 userSchema.methods.generateAuthToken = async function () {
     const user = this   //this refers to the current user
-    console.log('generateAuthToken-before');
     const token = jwt.sign({ _id: user._id.toString() }, 'thisismynewcourse', { expiresIn: '2 weeks'})
-    console.log(token);
     user.tokens.push({ token });
     await user.save()
     return token
