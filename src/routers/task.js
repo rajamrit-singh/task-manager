@@ -17,9 +17,33 @@ router.post('/tasks', auth, async (req, res) => {
     }
 })
 
+// GET /tassks?completed=true
+// Get /tasks?limit=10&skip = 20  => Limit the number of requests to 10 and skip the first 20 results
+// GET /tasls?sortBy=sortBy=createdAt:asc => Sort the data by created date in ascending order
 router.get('/tasks', auth, async (req, res) => {
+    const match = {}
+    const sort = {}
+    if (req.query.completed) {
+        match.completed = req.query.completed === 'true'
+    }
+
+    if(req.query.sortBy) {
+        const parts = req.query.sortBy.split(':')
+        console.log(parts[1])
+        sort[parts[0]] = parts[1] === 'asc' ? 1 : -1
+    }
     try {
-        await req.user.populate('tasks')
+        // await req.user.populate('tasks')
+        await req.user.populate({
+            path: 'tasks',
+            match,
+            options: {
+                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip),
+                sort
+            }
+        })
+
         /*
         Instead of using populate, we can use the below approach as well
         const tasks = await Task.find({
