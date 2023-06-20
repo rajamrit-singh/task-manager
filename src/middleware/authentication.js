@@ -18,6 +18,7 @@ const auth = async (req, res, next) => {
         if (!user) {
             throw new Error()
         }
+        req.token = token   //Pass the token to route handler for logout for removing the current token
         req.user = user     //Pass the user to the route handler so it doesn't have to search again
         next()
     } catch (error) {
