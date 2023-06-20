@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
+const Task = require('./task')
 /*const User = mongoose.model('User', {   //2nd argument is an object and mongoose converts this object into a scheme behind the scenes. In order to take advantage of middlewares, we need to directly pass the schema as show below
     name: {
         type: String,
@@ -88,6 +89,12 @@ const userSchema = new mongoose.Schema({
         }
     }]
 })
+
+userSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id',     //Where local data is stored
+    foreignField: 'owner'   //Name of the field on the other thing that will create the relationship
+})
 // generate a method on a specific user (adding methods on instances of object/model)
 userSchema.methods.generateAuthToken = async function () {
     const user = this   //this refers to the current user
@@ -132,5 +139,14 @@ userSchema.pre('save', async function (next) {
     }
     next()  //Call when done so that node will know that we are done with the middleware
 });
+
+//Delete user task when user is removed
+userSchema.pre('remove', async function (next) {
+    const user = this
+    await Task.deleteMany({
+        owner: user._id
+    })
+    next()
+})
 const User = mongoose.model('User', userSchema)
 module.exports = User
