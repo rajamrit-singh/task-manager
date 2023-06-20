@@ -97,6 +97,19 @@ userSchema.methods.generateAuthToken = async function () {
     return token
 }
 
+userSchema.methods.toJSON = function () {
+    const user = this
+    /*
+    It converts the user instance to a plain JavaScript object using user.toObject().
+    This step is necessary because Mongoose documents have various internal properties
+    and methods that are not needed when returning a user object.
+    */
+    const userObject = user.toObject()
+    delete userObject.password
+    delete userObject.tokens
+    return userObject
+}
+
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({
         email
