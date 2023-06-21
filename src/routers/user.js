@@ -1,9 +1,9 @@
 const express = require('express')
 const User = require('../models/user')
 const auth = require('../middleware/authentication') 
-
+const multer = require('multer')
+const sharp = require('sharp')
 const router = new express.Router()
-
 
 router.post('/users', async (req, res) => {
     const user = new User(req.body)
@@ -99,6 +99,68 @@ router.delete('/users/me', auth, async(req, res) => {
         res.send(req.user)
     } catch(error) {
         res.status(500).send(error)
+    }
+})
+
+const errorMiddleware = (req, res, next) => {
+    throw new Error('From my middleware')
+}
+
+const upload = multer({
+    //Commenting dest so that we can save it on user profile
+    // dest: 'avatar',  //name of folder where everything will be stored
+    limits: {
+        fileSize: 1000000,   //Restricting file size to 1mb
+    },
+    fileFilter(req, file, cb) {
+        if(!file.originalname.match(/\.(jpg|jpeg|png)/)) {
+            return cb(new Error('Please upload an image'))
+        }
+        cb(undefined, true)
+    }
+})
+
+router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
+    /*Multer passes the data for the file through req.file
+      This is only for the case where dest is not specified
+    */
+    const buffer = await sharp(req.file.buffer)
+                        .resize({ width: 250, height: 250 })   //Resize to standard size
+                        .png()  //Convert to png
+                        .toBuffer()  //Convert to sharp buffer so that we can work on it
+
+    req.user.avatar = buffer
+    await req.user.save()
+    res.status(200).send()
+}, (error, req, res, next) => {
+    res.status(400).send({
+        error: error.message
+    })
+})
+
+router.delete('/users/me/avatar', auth, async (req, res) => {
+    try {
+        req.user.avatar = undefined;
+        await req.user.save()
+        res.send(req.user)
+    } catch (err) {
+        res.status(400).send({
+            error: err.message
+        })
+    }
+})
+
+router.get('/users/:id/avatar', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+        if (!user || !user.avatar) {
+            throw new Error()
+        } else {
+            res.set('Content-Type', 'image/png')   //Set response headers
+            res.send(user.avatar)
+        }
+    } catch (error) {
+        res.status(400).send()
     }
 })
 
