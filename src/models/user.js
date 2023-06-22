@@ -103,7 +103,7 @@ userSchema.virtual('tasks', {
 // generate a method on a specific user (adding methods on instances of object/model)
 userSchema.methods.generateAuthToken = async function () {
     const user = this   //this refers to the current user
-    const token = jwt.sign({ _id: user._id.toString() }, 'thisismynewcourse', { expiresIn: '2 weeks'})
+    const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: '2 weeks'})
     user.tokens.push({ token });
     await user.save()
     return token

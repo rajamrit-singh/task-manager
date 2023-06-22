@@ -5,7 +5,7 @@ const auth = async (req, res, next) => {
     try {
         const token = req.header('Authorization')   //Get access to the token using header method and passing what we need from the header
                         .replace('Bearer ', '')     //Get the token from Authorization and remove bearer
-        const decoded = jwt.verify(token, 'thisismynewcourse')  //Verifying the token by using the same secret used for generating
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)  //Verifying the token by using the same secret used for generating
         const user = await User.findOne({
             _id: decoded._id,   //Look for user with this specific object id
             /*Also check if the token exists in the list of tokens for the user. We check this because decoder will just check
