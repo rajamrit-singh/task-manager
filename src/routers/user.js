@@ -102,10 +102,6 @@ router.delete('/users/me', auth, async(req, res) => {
     }
 })
 
-const errorMiddleware = (req, res, next) => {
-    throw new Error('From my middleware')
-}
-
 const upload = multer({
     //Commenting dest so that we can save it on user profile
     // dest: 'avatar',  //name of folder where everything will be stored

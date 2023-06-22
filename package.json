@@ -7,7 +7,7 @@
     "start": "nodemon src/index.js",
     "dev": "env-cmd -f config/dev.env nodemon src/index.js",
     "test": "jest",
-    "dev-test": "env-cmd -f ./config/test.env jest --watch"
+    "dev-test": "env-cmd -f ./config/test.env jest --watch --runInBand"
   },
   "jest": {
     "testEnvironment": "node"
